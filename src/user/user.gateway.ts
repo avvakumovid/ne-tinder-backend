@@ -1,9 +1,15 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from '@nestjs/websockets';
+import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from '../auth/dto/create-user.dto';
+import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
+
+
+enum Status {
+  error = 'error',
+  success = 'success'
+}
 
 @WebSocketGateway({
   cors: {
@@ -31,24 +37,37 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('msgToServer')
   handelMessage(client: Socket, payload: string): any {
+    this.logger.log('msgToServer')
     this.server.emit('message', payload)
     return payload
   }
 
   @SubscribeMessage('createUser')
-  create(@MessageBody() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@MessageBody() createUserDto: CreateUserDto, @ConnectedSocket() client: Socket) {
+    // this.server.emit('message', createUserDto)
+    // client.emit('createUser', createUserDto)
+
+    const candidate = await this.userService.findOne(createUserDto.email)
+    if (candidate) {
+      client.emit('createUser', { status: Status.error, msg: `Пользователь ${createUserDto.email} уже существует`, user: null })
+      return
+    }
+    const user = await this.userService.create(createUserDto);
+    client.emit('createUser', {
+      status: Status.success, msg: `Пользователь создан`, user: user
+    })
+    return user
+    // return this.userService.create(createUserDto);
   }
 
   @SubscribeMessage('findAllUser')
   findAll() {
-    return 'asd'
     return this.userService.findAll();
   }
 
   @SubscribeMessage('findOneUser')
-  findOne(@MessageBody() id: number) {
-    return this.userService.findOne(id);
+  findOne(@MessageBody() username: string) {
+    return this.userService.findOne(username);
   }
 
   @SubscribeMessage('updateUser')
