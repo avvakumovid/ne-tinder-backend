@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { comparePassword, encodingPassword } from 'src/utils/bcrypt';
-
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer'
+import { extname } from 'path'
+import fs from 'fs'
 enum Status {
   error = 'error',
   ok = 'ok'
@@ -67,4 +70,21 @@ export class AuthController {
   }
 
 
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './files',
+      filename: (req, file, callback) => {
+        const uniqeSuffix = Date.now() + '_ ' + Math.round(Math.random() * 1e9)
+        const ext = extname(file.originalname)
+        const fileName = `${file.originalname}-${uniqeSuffix}${ext}`
+        callback(null, fileName)
+      }
+    })
+  }))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+
+    console.log(file)
+    return 'File was be save'
+  }
 }
