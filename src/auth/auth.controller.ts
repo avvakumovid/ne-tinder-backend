@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './../user/user.service';
@@ -6,8 +6,8 @@ import { LoginDto } from './dto/login.dto';
 import { comparePassword, encodingPassword } from 'src/utils/bcrypt';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer'
-import { extname } from 'path'
-import fs from 'fs'
+import { parse } from 'path'
+
 enum Status {
   error = 'error',
   ok = 'ok'
@@ -75,16 +75,24 @@ export class AuthController {
     storage: diskStorage({
       destination: './files',
       filename: (req, file, callback) => {
-        const uniqeSuffix = Date.now() + '_ ' + Math.round(Math.random() * 1e9)
-        const ext = extname(file.originalname)
-        const fileName = `${file.originalname}-${uniqeSuffix}${ext}`
+        const uniqeSuffix = Date.now() + '_' + Math.round(Math.random() * 1e9)
+        const { name, ext } = parse(file.originalname)
+        // const name = basename(file.originalname)
+        // const ext = extname(file.originalname)
+        const fileName = `${name}_${uniqeSuffix}${ext}`
         callback(null, fileName)
       }
     })
   }))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body) {
 
     console.log(file)
-    return 'File was be save'
+    return file
+  }
+
+
+  @Get('file/:filename')
+  async getImage(@Param('filename') filename: string, @Res() res: any) {
+    res.sendFile(`C:/dev/ne-tinder/ne-tinder-backend/files/${filename}`)
   }
 }

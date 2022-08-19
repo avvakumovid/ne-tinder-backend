@@ -34,6 +34,7 @@ export class User {
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }])
     matches: User[]
 
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
