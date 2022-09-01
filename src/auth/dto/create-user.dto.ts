@@ -3,4 +3,7 @@ export class CreateUserDto {
     public password: string
     public name: string
     public birthdate: Date
+    public pictures: string[]
+    public gender: 'Male' | 'Female'
+
 }

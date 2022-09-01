@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, UseInterceptors, UploadedFile, Res, UploadedFiles } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserService } from './../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { comparePassword, encodingPassword } from 'src/utils/bcrypt';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -14,22 +13,37 @@ enum Status {
 }
 
 @Controller()
-export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly userService: UserService) { }
+export class UsersController {
+  constructor(private readonly usersService: UsersService) { }
   private logger: Logger = new Logger('AuthController')
+
+
   @Post('/registration')
-  async registration(@Body() createUserDto: CreateUserDto) {
+  @UseInterceptors(FilesInterceptor('files', 9, {
+    storage: diskStorage({
+      destination: './files',
+      filename: (req, file, callback) => {
+        const uniqeSuffix = Date.now() + '_' + Math.round(Math.random() * 1e9)
+        const { name, ext } = parse(file.originalname)
+        // const name = basename(file.originalname)
+        // const ext = extname(file.originalname)
+        const fileName = `${name}_${uniqeSuffix}${ext}`
+        callback(null, fileName)
+      }
+    })
+  }))
+  async registration(@UploadedFiles() files: Array<Express.Multer.File>, @Body() createUserDto: CreateUserDto) {
 
     try {
 
-      const candidate = await this.userService.findOne(createUserDto.email)
+      const candidate = await this.usersService.findOne(createUserDto.email)
       if (candidate) {
         return {
           status: Status.error, msg: `Пользователь c такой почтой уже зарегистрирован`
         }
       }
       const password = encodingPassword(createUserDto.password)
-      const user = await this.userService.create({ ...createUserDto, password });
+      const user = await this.usersService.create({ ...createUserDto, password, pictures: files.map(f => f.filename) });
       return {
         status: Status.ok, msg: `Пользователь создан`, user: user
       }
@@ -45,7 +59,7 @@ export class AuthController {
 
     try {
 
-      const user = await this.userService.findOne(loginDto.email)
+      const user = await this.usersService.findOne(loginDto.email)
       if (!user) {
         return {
           status: Status.error, msg: `Неверная почта или пароль`
@@ -85,7 +99,6 @@ export class AuthController {
     })
   }))
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body) {
-
     console.log(file)
     return file
   }
@@ -105,7 +118,6 @@ export class AuthController {
     })
   }))
   async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body) {
-
     console.log(files)
     return files
   }
