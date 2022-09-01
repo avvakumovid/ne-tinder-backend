@@ -1,7 +1,7 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import { UserService } from './user.service';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
-import { UpdateUserDto } from '../auth/dto/update-user.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { Socket, Server } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
