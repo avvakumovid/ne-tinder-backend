@@ -1,5 +1,5 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
-import { UserService } from './user.service';
+import { MainService } from './main.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { Socket, Server } from 'socket.io';
@@ -16,8 +16,8 @@ enum Status {
     origin: '*',
   },
 })
-export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly userService: UserService) { }
+export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly mainService: MainService) { }
 
   @WebSocketServer()
   server: Server
@@ -47,36 +47,36 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // this.server.emit('message', createUserDto)
     // client.emit('createUser', createUserDto)
 
-    const candidate = await this.userService.findOne(createUserDto.email)
-    if (candidate) {
-      client.emit('createUser', { status: Status.error, msg: `Пользователь ${createUserDto.email} уже существует`, user: null })
-      return
-    }
-    const user = await this.userService.create(createUserDto);
-    client.emit('createUser', {
-      status: Status.success, msg: `Пользователь создан`, user: user
-    })
-    return user
-    // return this.userService.create(createUserDto);
+    // const candidate = await this.mainService.findOne(createUserDto.email)
+    // if (candidate) {
+    //   client.emit('createUser', { status: Status.error, msg: `Пользователь ${createUserDto.email} уже существует`, user: null })
+    //   return
+    // }
+    // const user = await this.mainService.create(createUserDto);
+    // client.emit('createUser', {
+    //   status: Status.success, msg: `Пользователь создан`, user: user
+    // })
+    // return user
+    // return this.mainService.create(createUserDto);
   }
 
   @SubscribeMessage('findAllUser')
   findAll() {
-    return this.userService.findAll();
+    return this.mainService.findAll();
   }
 
   @SubscribeMessage('findOneUser')
   findOne(@MessageBody() username: string) {
-    return this.userService.findOne(username);
+    return this.mainService.findOne(username);
   }
 
   @SubscribeMessage('updateUser')
   update(@MessageBody() updateUserDto: UpdateUserDto) {
-    return this.userService.update(updateUserDto.id, updateUserDto);
+    return this.mainService.update(updateUserDto.id, updateUserDto);
   }
 
   @SubscribeMessage('removeUser')
   remove(@MessageBody() id: number) {
-    return this.userService.remove(id);
+    return this.mainService.remove(id);
   }
 }

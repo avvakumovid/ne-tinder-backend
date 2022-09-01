@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './users/users.module';
+import { UsersModule } from './users/users.module';
 import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb+srv://admin:admin@ne-tinder.4n3kn.mongodb.net/ne-tinder?retryWrites=true&w=majority'),
-    UserModule,
-    AuthModule,
+    UsersModule,
     MulterModule.register({ dest: './uploads' })
   ],
   controllers: [],
