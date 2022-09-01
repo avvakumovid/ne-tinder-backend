@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, UseInterceptors, UploadedFile, Res, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, UseInterceptors, UploadedFile, Res, UploadedFiles, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -6,6 +6,8 @@ import { comparePassword, encodingPassword } from 'src/utils/bcrypt';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer'
 import { parse } from 'path'
+import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './../auth/local-auth.guard';
 
 enum Status {
   error = 'error',
@@ -59,10 +61,11 @@ export class UsersController {
 
     try {
 
+      console.log(loginDto)
       const user = await this.usersService.findOne(loginDto.email)
       if (!user) {
         return {
-          status: Status.error, msg: `Неверная почта или пароль`
+          status: Status.error, msg: `Неверная почта или пароль 1`
         }
       }
       const matched = comparePassword(loginDto.password, user.password)
@@ -74,7 +77,7 @@ export class UsersController {
       }
 
       return {
-        status: Status.error, msg: `Неверная почта или пароль`
+        status: Status.error, msg: `Неверная почта или пароль 2`
       }
     } catch (e) {
       return {
@@ -125,5 +128,13 @@ export class UsersController {
   @Get('file/:filename')
   async getImage(@Param('filename') filename: string, @Res() res: any) {
     res.sendFile(`C:/dev/ne-tinder/ne-tinder-backend/files/${filename}`)
+  }
+
+
+  @UseGuards(LocalAuthGuard)
+  @Post('/validateLogin')
+  async validateLogin(@Request() req) {
+    console.log(req)
+    return req.user
   }
 }
