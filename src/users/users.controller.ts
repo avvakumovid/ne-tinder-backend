@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, UseInterceptors, UploadedFile, Res, UploadedFiles, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, UseInterceptors, UploadedFile, Res, UploadedFiles, Request, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -10,6 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './../auth/local-auth.guard';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { LikeDto } from './dto/like.dto';
 
 enum Status {
   error = 'error',
@@ -138,6 +139,12 @@ export class UsersController {
   @Get('users')
   async getUsers() {
     return await this.usersService.getUsers()
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('like')
+  async like(@Request() req, @Body() likeDto: LikeDto) {
+    this.usersService.like(req.user.userId, likeDto.id)
   }
 
 }
