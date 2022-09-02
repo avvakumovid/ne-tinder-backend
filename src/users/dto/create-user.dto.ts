@@ -5,5 +5,6 @@ export class CreateUserDto {
     public birthdate: Date
     public pictures: string[]
     public gender: 'Male' | 'Female'
+    public age: number
 
 }

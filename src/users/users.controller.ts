@@ -47,7 +47,11 @@ export class UsersController {
         }
       }
       const password = encodingPassword(createUserDto.password)
-      const user = await this.usersService.create({ ...createUserDto, password, pictures: files.map(f => f.filename) });
+      const birthdate = new Date(createUserDto.birthdate)
+      const ageDifMs = Date.now() - birthdate.getTime();
+      const ageDate = new Date(ageDifMs); // miliseconds from epoch
+      const age = Math.abs(ageDate.getUTCFullYear() - 1970)
+      const user = await this.usersService.create({ ...createUserDto, password, age, birthdate, pictures: files.map(f => f.filename) });
       return {
         status: Status.ok, msg: `Пользователь создан`, user: user
       }

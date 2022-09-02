@@ -17,14 +17,6 @@ export class UsersService {
     return await createUser.save()
   }
 
-  async login(loginDto: LoginDto): Promise<User> {
-    const user = await this.userModel.findOne({ email: loginDto.email })
-    if (user.password === loginDto.password) {
-      return user;
-    }
-    return null;
-  }
-
   async findOne(email: string) {
     return await this.userModel.findOne({ email });
   }

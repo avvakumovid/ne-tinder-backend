@@ -19,6 +19,9 @@ export class User {
     @Prop({ required: true })
     birthdate: Date
 
+    @Prop({ required: true })
+    gender: 'Female' | 'Male'
+
     @Prop()
     age: number
 
@@ -33,6 +36,8 @@ export class User {
 
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }])
     matches: User[]
+
+
 
 
 }
