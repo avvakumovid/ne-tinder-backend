@@ -8,6 +8,8 @@ import { diskStorage } from 'multer'
 import { parse } from 'path'
 import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './../auth/local-auth.guard';
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { AuthService } from 'src/auth/auth.service';
 
 enum Status {
   error = 'error',
@@ -56,12 +58,10 @@ export class UsersController {
     }
   }
 
-  @Post('/login')
+  @Post('/logino')
   async login(@Body() loginDto: LoginDto) {
 
     try {
-
-      console.log(loginDto)
       const user = await this.usersService.findOne(loginDto.email)
       if (!user) {
         return {
@@ -130,11 +130,10 @@ export class UsersController {
     res.sendFile(`C:/dev/ne-tinder/ne-tinder-backend/files/${filename}`)
   }
 
-
-  @UseGuards(LocalAuthGuard)
-  @Post('/validateLogin')
-  async validateLogin(@Request() req) {
-    console.log(req)
-    return req.user
+  @UseGuards(JwtAuthGuard)
+  @Get('users')
+  async getUsers() {
+    return await this.usersService.getUsers()
   }
+
 }

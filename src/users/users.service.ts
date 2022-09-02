@@ -29,5 +29,8 @@ export class UsersService {
     return await this.userModel.findOne({ email });
   }
 
+  async getUsers() {
+    return await this.userModel.find();
+  }
 
 }
