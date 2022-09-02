@@ -3,6 +3,7 @@ import { Strategy } from 'passport-local';
 import { AuthService } from './auth.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { comparePassword } from 'src/utils/bcrypt';
+import { UsersService } from 'src/users/users.service';
 
 
 
@@ -13,7 +14,7 @@ enum Status {
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
 
-    constructor(private authService: AuthService) {
+    constructor(private authService: AuthService, private userService: UsersService) {
         super(
             {
                 usernameField: 'email',
@@ -25,9 +26,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     async validate(username: string, password: string) {
         try {
 
-
-
-            const user = await this.authService.findOne(username);
+            const user = await this.userService.findOne(username);
             if (!user) {
                 throw new UnauthorizedException();
             }
