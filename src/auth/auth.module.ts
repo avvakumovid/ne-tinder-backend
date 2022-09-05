@@ -11,6 +11,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { Chat } from 'src/chat/chat.schema';
+import { ChatSchema } from './../chat/chat.schema';
 
 
 @Module({
@@ -18,6 +20,11 @@ import { JwtStrategy } from './jwt.strategy';
     UsersModule,
     PassportModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60h' }
+    }),
+    MongooseModule.forFeature([{ name: Chat.name, schema: ChatSchema }]),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60h' }

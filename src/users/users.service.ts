@@ -3,13 +3,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument } from './user.schema';
 import { Model } from 'mongoose';
-import { LoginDto } from './dto/login.dto';
 import { User } from './entities/user.entity';
+import { Chat, ChatDocument } from 'src/chat/chat.schema';
 
 @Injectable()
 export class UsersService {
 
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Chat.name) private chatModel: Model<ChatDocument>) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const createUser = await new this.userModel(createUserDto)
@@ -37,12 +38,26 @@ export class UsersService {
     user1.myLikes.push(user2)
     user2.meLikes.push(user1)
 
+
+    const createChat = await new this.chatModel({ users: [user1, user2] })
+
+    const chat = await createChat.save()
+
+    console.log(user1.meLikes.includes(user2.id))
+    console.log(user1.meLikes.includes(user2))
+    console.log(user1.meLikes)
+
     if (
       (user1.meLikes.includes(user2.id) && user2.myLikes.includes(user1.id)) ||
       (user2.meLikes.includes(user1.id) && user1.myLikes.includes(user2.id))
     ) {
-      user1.matches.push(user2)
-      user2.matches.push(user1)
+      user1.matches.push({ chat, user: user2 })
+      // user1.chats.push(chat)
+      user2.matches.push({ chat, user: user1 })
+      // user2.chats.push(chat)
+
+
+
     }
 
     user1.save()

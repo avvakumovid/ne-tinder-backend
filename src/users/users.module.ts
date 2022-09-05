@@ -5,6 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './user.schema';
 import { User } from './entities/user.entity';
 import mongooseAutoPopulate from 'mongoose-autopopulate';
+import { Chat } from 'src/chat/chat.schema';
+import { ChatSchema } from './../chat/chat.schema';
 
 
 @Module({
@@ -12,6 +14,15 @@ import mongooseAutoPopulate from 'mongoose-autopopulate';
     name: User.name,
     useFactory: () => {
       const schema = UserSchema;
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      // schema.plugin(require('mongoose-autopopulate'))
+      // schema.plugin(mongooseAutoPopulate)
+      return schema
+    }
+  }]), MongooseModule.forFeatureAsync([{
+    name: Chat.name,
+    useFactory: () => {
+      const schema = ChatSchema;
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       // schema.plugin(require('mongoose-autopopulate'))
       // schema.plugin(mongooseAutoPopulate)

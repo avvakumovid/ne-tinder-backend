@@ -1,4 +1,4 @@
-import { Get, Injectable, Request, UseGuards } from '@nestjs/common';
+import { Get, Injectable, Request, UseGuards, forwardRef, Inject, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Injectable()
 export class AuthService {
+    private logger: Logger = new Logger('AuthService')
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
         private userService: UsersService,
@@ -24,10 +25,13 @@ export class AuthService {
     }
 
     async login(user: any) {
+        this.logger.log('ff')
         const payload = { email: user.email, sub: user._id }
-        return {
+        const token = {
             access_token: this.jwtService.sign(payload)
         }
+        this.logger.log(token)
+        return token
     }
 
 

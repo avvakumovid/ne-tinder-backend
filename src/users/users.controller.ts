@@ -20,7 +20,7 @@ enum Status {
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
-  private logger: Logger = new Logger('AuthController')
+  private logger: Logger = new Logger('UsersController')
 
 
   @Post('/registration')

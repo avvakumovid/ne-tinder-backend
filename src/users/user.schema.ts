@@ -1,6 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, } from 'mongoose';
+import { Chat } from 'src/chat/chat.schema';
 
 
 export type UserDocument = User & Document
@@ -8,7 +9,7 @@ export type UserDocument = User & Document
 
 @Schema()
 export class User {
-    [x: string]: any;
+
     @Prop({ required: true, unique: true })
     email: string
 
@@ -36,14 +37,19 @@ export class User {
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [], autopopulate: true }])
     meLikes: User[]
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [], autopopulate: true }])
-    matches: User[]
+    @Prop()
+    matches: [{
+        user: User,
+        chat: Chat
+    }]
 
+    @Prop()
+    pictures: string[]
 
-
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat', default: [], autopopulate: true }])
+    chats: Chat[]
 
 }
-
 
 
 export const UserSchema = SchemaFactory.createForClass(User)

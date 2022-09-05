@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { AuthModule } from './auth/auth.module';
-import mongooseAutoPopulate from 'mongoose-autopopulate';
 
 @Module({
   imports: [
@@ -17,6 +16,7 @@ import mongooseAutoPopulate from 'mongoose-autopopulate';
       }),
     UsersModule,
     AuthModule,
+    // ChatModule,
     MulterModule.register({ dest: './uploads' })
   ],
   controllers: [],
