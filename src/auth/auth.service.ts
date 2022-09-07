@@ -7,6 +7,9 @@ import { User, UserDocument } from 'src/users/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+
+
+
 @Injectable()
 export class AuthService {
     private logger: Logger = new Logger('AuthService')
@@ -25,12 +28,10 @@ export class AuthService {
     }
 
     async login(user: any) {
-        this.logger.log('ff')
-        const payload = { email: user.email, sub: user._id }
+        const payload = { email: user.email, id: user._id.toString() }
         const token = {
             access_token: this.jwtService.sign(payload)
         }
-        this.logger.log(token)
         return token
     }
 

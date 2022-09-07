@@ -11,6 +11,7 @@ import { LocalAuthGuard } from './../auth/local-auth.guard';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { LikeDto } from './dto/like.dto';
+import { FindeUserDto } from './dto/find-user.dto';
 
 enum Status {
   error = 'error',
@@ -137,14 +138,14 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('users')
-  async getUsers() {
-    return await this.usersService.getUsers()
+  async getUsers(@Request() req, @Body() findeUserDto: FindeUserDto) {
+    return await this.usersService.getUsers({ ...findeUserDto, userId: req.user.id })
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('like')
   async like(@Request() req, @Body() likeDto: LikeDto) {
-    this.usersService.like(req.user.userId, likeDto.id)
+    this.usersService.like(req.user.id, likeDto.id)
   }
 
 }

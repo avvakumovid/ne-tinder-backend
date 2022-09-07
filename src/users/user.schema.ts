@@ -4,6 +4,7 @@ import mongoose, { Document, } from 'mongoose';
 import { Chat } from 'src/chat/chat.schema';
 
 
+
 export type UserDocument = User & Document
 
 
@@ -31,23 +32,23 @@ export class User {
     @Prop({ default: [] })
     location: number[]
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [], autopopulate: true }])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }])
     myLikes: User[]
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [], autopopulate: true }])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }])
     meLikes: User[]
 
-    @Prop()
-    matches: [{
-        user: User,
-        chat: Chat
-    }]
+    @Prop([{
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        chat: { type: mongoose.Schema.Types.ObjectId, ref: 'chat', required: true }
+    }])
+    matches
 
     @Prop()
     pictures: string[]
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat', default: [], autopopulate: true }])
-    chats: Chat[]
+    // @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat', default: [] }])
+    // chats: Chat[]
 
 }
 

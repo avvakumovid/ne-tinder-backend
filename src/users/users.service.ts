@@ -5,6 +5,10 @@ import { UserDocument } from './user.schema';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { Chat, ChatDocument } from 'src/chat/chat.schema';
+import { FindeUserDto } from './dto/find-user.dto';
+
+
+
 
 @Injectable()
 export class UsersService {
@@ -25,8 +29,16 @@ export class UsersService {
     return await this.userModel.findById(id)
   }
 
-  async getUsers() {
-    return await this.userModel.find()
+
+  async getUsers(options: FindeUserDto) {
+    return await this.userModel.find({
+      age: { $gte: options.minAge ?? 0, $lte: options.maxAge ?? 999 },
+      gender: options.gender ?? { $regex: '' },
+      _id: { $nin: [options.userId, ...options.matches ?? []] }
+    })
+      .populate('myLikes', '_id age gender pictures name location')
+      .populate('meLikes', '_id age gender pictures name location')
+      .populate('matches.user', '_id age gender pictures name location')
   }
 
   async like(id1: string, id2: string) {
@@ -39,21 +51,18 @@ export class UsersService {
     user2.meLikes.push(user1)
 
 
-    const createChat = await new this.chatModel({ users: [user1, user2] })
 
-    const chat = await createChat.save()
+    const createChat = await new this.chatModel({ users: [user1, user2] }).save()
+    const chat = await this.chatModel.findById(createChat.id)
 
-    console.log(user1.meLikes.includes(user2.id))
-    console.log(user1.meLikes.includes(user2))
-    console.log(user1.meLikes)
 
     if (
       (user1.meLikes.includes(user2.id) && user2.myLikes.includes(user1.id)) ||
       (user2.meLikes.includes(user1.id) && user1.myLikes.includes(user2.id))
     ) {
-      user1.matches.push({ chat, user: user2 })
+      user1.matches.push({ chat: chat._id, user: user2._id })
       // user1.chats.push(chat)
-      user2.matches.push({ chat, user: user1 })
+      user2.matches.push({ chat: chat._id, user: user1._id })
       // user2.chats.push(chat)
 
 
@@ -64,4 +73,5 @@ export class UsersService {
     user2.save()
 
   }
+
 }

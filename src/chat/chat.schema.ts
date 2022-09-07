@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-import { User } from 'src/users/user.schema';
+import mongoose, { Document } from 'mongoose';
+
 
 
 export type ChatDocument = Chat & Document
@@ -9,13 +9,13 @@ export type ChatDocument = Chat & Document
 export class Chat {
 
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }])
-    users: User[]
+    users
 
     @Prop({ default: [] })
     massages: [{
         date: Date,
         message: string;
-        author: User
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
     }]
 
 
