@@ -74,4 +74,13 @@ export class UsersService {
 
   }
 
+  async getUserInfo(id: string) {
+    return await this.userModel.findById(id,
+      'myLikes meLikes matches pictures location age gender name id'
+    )
+      .populate('myLikes', '_id age gender pictures name location')
+      .populate('meLikes', '_id age gender pictures name location')
+      .populate('matches.user', '_id age gender pictures name location')
+  }
+
 }

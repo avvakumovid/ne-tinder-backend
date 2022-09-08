@@ -148,4 +148,15 @@ export class UsersController {
     this.usersService.like(req.user.id, likeDto.id)
   }
 
+
+  @UseGuards(JwtAuthGuard)
+  @Get('info')
+  async getUserInfo(@Request() req) {
+    // return {
+    //   info: 'asd'
+    // }
+    return await this.usersService.getUserInfo(req.user.id)
+  }
+
+
 }
