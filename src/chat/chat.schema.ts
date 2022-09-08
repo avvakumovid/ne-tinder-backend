@@ -12,7 +12,7 @@ export class Chat {
     users
 
     @Prop({ default: [] })
-    massages: [{
+    messages: [{
         date: Date,
         message: string;
         author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
