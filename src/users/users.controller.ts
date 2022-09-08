@@ -152,10 +152,14 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('info')
   async getUserInfo(@Request() req) {
-    // return {
-    //   info: 'asd'
-    // }
+
     return await this.usersService.getUserInfo(req.user.id)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('chats')
+  async getUserChats(@Request() req) {
+    return await this.usersService.getUserChats(req.user.id)
   }
 
 

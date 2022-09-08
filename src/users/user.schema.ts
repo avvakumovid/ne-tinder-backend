@@ -40,7 +40,7 @@ export class User {
 
     @Prop([{
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-        chat: { type: mongoose.Schema.Types.ObjectId, ref: 'chat', required: true }
+        chat: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat', required: true }
     }])
     matches
 

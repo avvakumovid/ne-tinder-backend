@@ -83,4 +83,13 @@ export class UsersService {
       .populate('matches.user', '_id age gender pictures name location')
   }
 
+  async getUserChats(id: string) {
+    return await this.userModel.findById(id,
+      'matches'
+    )
+      .populate('matches.user', '_id age gender pictures name location')
+      .populate('matches.chat')
+
+  }
+
 }
